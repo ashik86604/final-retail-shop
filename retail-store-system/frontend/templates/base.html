@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Retail Store Management System{% endblock %}</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-gradient shadow-sm sticky-top">
+    <div class="container-fluid px-4">
+        <a class="navbar-brand fw-bold d-flex align-items-center" href="/dashboard">
+            <i class="bi bi-shop me-2" style="font-size: 1.5rem;"></i>
+            <span>RetailHub</span>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto gap-2">
+                <li class="nav-item">
+                    <a class="nav-link" href="/dashboard">
+                        <i class="bi bi-graph-up"></i> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/inventory">
+                        <i class="bi bi-box-seam"></i> Inventory
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/billing">
+                        <i class="bi bi-receipt"></i> Billing
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/customers">
+                        <i class="bi bi-people"></i> Customers
+                    </a>
+                </li>
+                <li class="nav-item">
+<li class="nav-item" id="adminNavLink" style="display: none;">
+    <a class="nav-link" href="/admin">
+        <i class="bi bi-shield-check"></i> Admin
+    </a>
+</li>
+<li class="nav-item" id="reportsNavLink" style="display: none;">
+    <a class="nav-link" href="/reports">
+        <i class="bi bi-graph-up"></i> Reports
+    </a>
+</li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/chatbot">
+                        <i class="bi bi-chat-dots"></i> AI Chat
+                    </a>
+                </li>
+                <li class="nav-item">
+    <a class="nav-link" href="/admin">
+        <i class="bi bi-shield-check"></i> Admin
+    </a>
+</li>
+                <li class="nav-item">
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-person-circle"></i> <span id="userNameDisplay">User</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="#" onclick="editProfile()"><i class="bi bi-gear"></i> Profile</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger" href="#" onclick="handleLogout(); return false;"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- MAIN CONTAINER -->
+<div class="container-fluid px-4 py-5">
+    {% block content %}{% endblock %}
+</div>
+
+<!-- FOOTER -->
+<footer class="bg-light py-4 mt-5 border-top">
+    <div class="container text-center">
+        <p class="text-muted mb-0">&copy; 2026 RetailHub. All rights reserved.</p>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Auth Guard MUST be first -->
+<script src="{{ url_for('static', filename='js/auth-guard.js') }}"></script>
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

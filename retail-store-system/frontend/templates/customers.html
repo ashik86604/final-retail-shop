@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+
+{% block title %}Customers - RetailHub{% endblock %}
+
+{% block content %}
+<div class="mb-5">
+    <div class="row align-items-center mb-4">
+        <div class="col">
+            <h1 class="text-gradient fw-bold mb-1">
+                <i class="bi bi-people"></i> Customers
+            </h1>
+            <p class="text-muted">Manage your customer database</p>
+        </div>
+        <div class="col-auto">
+            <button class="btn btn-success btn-lg rounded-3 shadow-sm" data-bs-toggle="modal" data-bs-target="#addCustomerModal">
+                <i class="bi bi-person-plus me-2"></i> Add Customer
+            </button>
+        </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="row mb-4 g-3">
+        <div class="col-md-4">
+            <div class="card stat-card border-0 shadow-sm rounded-4 bg-gradient-primary">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="icon-box me-3">
+                            <i class="bi bi-people-fill" style="font-size: 2rem; color: #0072ff;"></i>
+                        </div>
+                        <div>
+                            <p class="text-muted mb-0 small">Total Customers</p>
+                            <h3 class="fw-bold mb-0" id="totalCustomers">0</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table -->
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+        <div class="card-header bg-light border-0 py-4 px-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 fw-bold">
+                    <i class="bi bi-list-ul"></i> Customers List
+                </h5>
+                <div class="input-group" style="max-width: 250px;">
+                    <span class="input-group-text border-0 bg-white">
+                        <i class="bi bi-search"></i>
+                    </span>
+                    <input type="text" class="form-control border-0" id="searchInput" placeholder="Search customers...">
+                </div>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0 align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-4"><strong>#</strong></th>
+                            <th><strong>Name</strong></th>
+                            <th><strong>Email</strong></th>
+                            <th><strong>Phone</strong></th>
+                            <th><strong>Date Added</strong></th>
+                            <th class="text-center pe-4"><strong>Actions</strong></th>
+                        </tr>
+                    </thead>
+                    <tbody id="customersBody">
+                    </tbody>
+                </table>
+            </div>
+            <div id="emptyState" class="text-center py-5">
+                <i class="bi bi-inbox" style="font-size: 3rem; color: #ddd;"></i>
+                <p class="text-muted mt-3">No customers yet.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ADD CUSTOMER MODAL -->
+<div class="modal fade" id="addCustomerModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4 shadow-lg">
+            <div class="modal-header border-0 bg-gradient-success rounded-top-4 p-4">
+                <h5 class="modal-title fw-bold text-white">
+                    <i class="bi bi-person-plus me-2"></i> Add Customer
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="addCustomerForm">
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Name *</label>
+                        <input required type="text" class="form-control form-control-lg rounded-3" id="customerName" placeholder="Full name">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Email</label>
+                        <input type="email" class="form-control form-control-lg rounded-3" id="customerEmail" placeholder="Email address">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Phone</label>
+                        <input type="tel" class="form-control form-control-lg rounded-3" id="customerPhone" placeholder="Phone number">
+                    </div>
+                </div>
+                <div class="modal-footer border-0 p-4 bg-light rounded-bottom-4">
+                    <button type="button" class="btn btn-secondary rounded-3" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success btn-lg rounded-3">Add Customer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- EDIT CUSTOMER MODAL -->
+<div class="modal fade" id="editCustomerModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4 shadow-lg">
+            <div class="modal-header border-0 bg-gradient-info rounded-top-4 p-4">
+                <h5 class="modal-title fw-bold text-white">
+                    <i class="bi bi-pencil-square me-2"></i> Edit Customer
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="editCustomerForm">
+                <input type="hidden" id="editCustomerId">
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Name *</label>
+                        <input required type="text" class="form-control form-control-lg rounded-3" id="editCustomerName">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Email</label>
+                        <input type="email" class="form-control form-control-lg rounded-3" id="editCustomerEmail">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Phone</label>
+                        <input type="tel" class="form-control form-control-lg rounded-3" id="editCustomerPhone">
+                    </div>
+                </div>
+                <div class="modal-footer border-0 p-4 bg-light rounded-bottom-4">
+                    <button type="button" class="btn btn-secondary rounded-3" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary btn-lg rounded-3">Update</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="toast-container position-fixed top-0 end-0 p-3" id="toastContainer"></div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/customers.js') }}"></script>
+{% endblock %}

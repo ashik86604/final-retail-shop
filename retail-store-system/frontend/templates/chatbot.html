@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+
+{% block title %}AI Chatbot - RetailHub{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mb-5">
+    <div class="col-md-8">
+        <h1 class="text-gradient fw-bold mb-1">
+            <i class="bi bi-chat-dots"></i> RetailHub Assistant
+        </h1>
+        <p class="text-muted mb-4">Ask me anything about your store!</p>
+
+        <!-- Chat Container -->
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden" style="min-height: 600px; display: flex; flex-direction: column;">
+            <!-- Chat Messages -->
+            <div class="card-body flex-grow-1 d-flex flex-column justify-content-end" id="chatMessages" style="background: #f9f9f9; overflow-y: auto; max-height: 500px;">
+                <!-- Messages will be injected here -->
+            </div>
+
+            <!-- Input Area -->
+            <div class="card-footer border-0 p-4 bg-white">
+                <form id="chatForm" class="d-flex gap-2">
+                    <input 
+                        type="text" 
+                        class="form-control form-control-lg rounded-pill" 
+                        id="chatInput" 
+                        placeholder="Ask me something..." 
+                        autocomplete="off"
+                    >
+                    <button type="submit" class="btn btn-success rounded-pill btn-lg" style="min-width: 50px;">
+                        <i class="bi bi-send-fill"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Quick Buttons -->
+        <div class="mt-4">
+            <p class="text-muted small mb-3">Quick Questions:</p>
+            <div class="d-flex gap-2 flex-wrap">
+                <button class="btn btn-outline-primary rounded-pill" onclick="sendQuickQuestion('Today sales')">
+                    <i class="bi bi-fire"></i> Today's Sales
+                </button>
+                <button class="btn btn-outline-success rounded-pill" onclick="sendQuickQuestion('Total products')">
+                    <i class="bi bi-box-seam"></i> Total Products
+                </button>
+                <button class="btn btn-outline-info rounded-pill" onclick="sendQuickQuestion('Total customers')">
+                    <i class="bi bi-people"></i> Customers
+                </button>
+                <button class="btn btn-outline-warning rounded-pill" onclick="sendQuickQuestion('Low stock')">
+                    <i class="bi bi-exclamation-triangle"></i> Low Stock
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const CHAT_URL = 'http://localhost:5000/api/chatbot/ask';
+    const chatMessages = document.getElementById('chatMessages');
+    const chatForm = document.getElementById('chatForm');
+    const chatInput = document.getElementById('chatInput');
+
+    // Load chat history from localStorage
+    document.addEventListener('DOMContentLoaded', () => {
+        const history = localStorage.getItem('chatHistory');
+        if (history) {
+            chatMessages.innerHTML = history;
+        } else {
+            addSystemMessage('Hello! I\'m your RetailHub Assistant. Ask me anything about your store! 👋');
+        }
+        scrollToBottom();
+    });
+
+    // Send message
+    chatForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const message = chatInput.value.trim();
+        
+        if (!message) return;
+
+        // Display user message
+        addUserMessage(message);
+        chatInput.value = '';
+
+        // Get AI response
+        try {
+            const response = await fetch(CHAT_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message })
+            });
+            const result = await response.json();
+
+            if (result.status === 'success') {
+                addAssistantMessage(result.response);
+            } else {
+                addSystemMessage('Sorry, I couldn\'t process that. Try asking something else.');
+            }
+        } catch (error) {
+            addSystemMessage('Connection error. Please try again.');
+        }
+        
+        saveChatHistory();
+        scrollToBottom();
+    });
+
+    function addUserMessage(text) {
+        const messageEl = document.createElement('div');
+        messageEl.className = 'd-flex justify-content-end mb-3';
+        messageEl.innerHTML = `
+            <div class="bg-primary text-white px-4 py-2 rounded-4" style="max-width: 70%; word-wrap: break-word;">
+                ${text}
+            </div>
+        `;
+        chatMessages.appendChild(messageEl);
+    }
+
+    function addAssistantMessage(text) {
+        const messageEl = document.createElement('div');
+        messageEl.className = 'd-flex justify-content-start mb-3';
+        messageEl.innerHTML = `
+            <div class="bg-light text-dark px-4 py-2 rounded-4" style="max-width: 70%; word-wrap: break-word;">
+                ${text}
+            </div>
+        `;
+        chatMessages.appendChild(messageEl);
+    }
+
+    function addSystemMessage(text) {
+        const messageEl = document.createElement('div');
+        messageEl.className = 'd-flex justify-content-start mb-3';
+        messageEl.innerHTML = `
+            <div class="bg-light text-dark px-4 py-2 rounded-4" style="max-width: 70%; word-wrap: break-word;">
+                <i class="bi bi-info-circle me-2"></i> ${text}
+            </div>
+        `;
+        chatMessages.appendChild(messageEl);
+    }
+
+    function sendQuickQuestion(question) {
+        chatInput.value = question;
+        chatForm.dispatchEvent(new Event('submit'));
+    }
+
+    function scrollToBottom() {
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function saveChatHistory() {
+        localStorage.setItem('chatHistory', chatMessages.innerHTML);
+    }
+</script>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/chatbot.js') }}"></script>
+{% endblock %}

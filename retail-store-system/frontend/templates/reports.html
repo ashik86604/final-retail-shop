@@ -1,0 +1,320 @@
+{% extends 'base.html' %}
+
+{% block title %}Reports & Analytics - RetailHub{% endblock %}
+
+{% block content %}
+<div class="mb-5">
+    <h1 class="text-gradient fw-bold mb-4">
+        <i class="bi bi-graph-up"></i> Analytics & Reports
+    </h1>
+
+    <!-- Tabs -->
+    <ul class="nav nav-tabs mb-4" id="reportTabs">
+        <li class="nav-item">
+            <a class="nav-link active" data-bs-toggle="tab" href="#daily-profits">Daily Profits</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="tab" href="#monthly-profits">Monthly Profits</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="tab" href="#inventory-health">Inventory Health</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="tab" href="#customer-metrics">Customer Metrics</a>
+        </li>
+    </ul>
+
+    <div class="tab-content">
+        <!-- Daily Profits -->
+        <div class="tab-pane fade show active" id="daily-profits">
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold mb-4">Daily Profit Breakdown</h5>
+                    <canvas id="dailyChart"></canvas>
+                </div>
+            </div>
+            <div class="table-responsive mt-4">
+                <table class="table" id="dailyTable">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Date</th>
+                            <th>Transactions</th>
+                            <th>Sales (₹)</th>
+                            <th>GST (₹)</th>
+                            <th>Net Profit (₹)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dailyBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Monthly Profits -->
+        <div class="tab-pane fade" id="monthly-profits">
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold mb-4">Monthly Profit Trend</h5>
+                    <canvas id="monthlyChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Inventory Health -->
+        <div class="tab-pane fade" id="inventory-health">
+            <div class="row g-4">
+                <div class="col-md-3">
+                    <div class="card stat-card border-0 shadow-sm rounded-4 bg-gradient-primary">
+                        <div class="card-body">
+                            <p class="text-muted small mb-1">Total Products</p>
+                            <h3 class="fw-bold" id="totalProducts">0</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card stat-card border-0 shadow-sm rounded-4 bg-gradient-success">
+                        <div class="card-body">
+                            <p class="text-muted small mb-1">Healthy Stock</p>
+                            <h3 class="fw-bold" id="healthyStock">0</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card stat-card border-0 shadow-sm rounded-4 bg-gradient-warning">
+                        <div class="card-body">
+                            <p class="text-muted small mb-1">Low Stock</p>
+                            <h3 class="fw-bold" id="lowStock">0</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card stat-card border-0 shadow-sm rounded-4 bg-gradient-danger">
+                        <div class="card-body">
+                            <p class="text-muted small mb-1">Out of Stock</p>
+                            <h3 class="fw-bold" id="outOfStock">0</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card mt-4 border-0 shadow-sm rounded-4">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold mb-3">Inventory Value: <span id="inventoryValue">₹0</span></h5>
+                    <canvas id="inventoryChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Customer Metrics -->
+        <div class="tab-pane fade" id="customer-metrics">
+            <div class="row g-4 mb-4">
+                <div class="col-md-3">
+                    <div class="card stat-card border-0 shadow-sm rounded-4 bg-gradient-primary">
+                        <div class="card-body">
+                            <p class="text-muted small mb-1">Total Customers</p>
+                            <h3 class="fw-bold" id="custTotal">0</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card stat-card border-0 shadow-sm rounded-4 bg-gradient-success">
+                        <div class="card-body">
+                            <p class="text-muted small mb-1">Total Transactions</p>
+                            <h3 class="fw-bold" id="custTransactions">0</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card stat-card border-0 shadow-sm rounded-4 bg-gradient-info">
+                        <div class="card-body">
+                            <p class="text-muted small mb-1">Avg Spending</p>
+                            <h3 class="fw-bold" id="custAvg">₹0</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card stat-card border-0 shadow-sm rounded-4 bg-gradient-warning">
+                        <div class="card-body">
+                            <p class="text-muted small mb-1">Top Customer Value</p>
+                            <h3 class="fw-bold" id="custTop">₹0</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="toast-container position-fixed top-0 end-0 p-3" id="toastContainer"></div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+<script src="{{ url_for('static', filename='js/auth-guard.js') }}"></script>
+<script>
+    const REPORTS_URL = 'http://localhost:5000/api/reports';
+    let dailyChart, monthlyChart, inventoryChart;
+
+    document.addEventListener('DOMContentLoaded', () => {
+        loadDailyProfits();
+        loadMonthlyProfits();
+        loadInventoryHealth();
+        loadCustomerMetrics();
+    });
+
+    // Daily Profits
+    async function loadDailyProfits() {
+        try {
+            const response = await fetch(`${REPORTS_URL}/daily-profits`);
+            const result = await response.json();
+
+            if (result.status === 'success') {
+                displayDailyProfits(result.data);
+                drawDailyChart(result.data);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+
+    function displayDailyProfits(data) {
+        let rows = '';
+        data.slice(-7).forEach(item => {
+            rows += `
+                <tr>
+                    <td>${item.date}</td>
+                    <td>${item.transactions}</td>
+                    <td>₹${item.sales.toFixed(2)}</td>
+                    <td>₹${item.gst.toFixed(2)}</td>
+                    <td><strong>₹${item.net_profit.toFixed(2)}</strong></td>
+                </tr>
+            `;
+        });
+        document.getElementById('dailyBody').innerHTML = rows;
+    }
+
+    function drawDailyChart(data) {
+        const lastDays = data.slice(-7);
+        const ctx = document.getElementById('dailyChart').getContext('2d');
+        
+        dailyChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: lastDays.map(d => d.date),
+                datasets: [{
+                    label: 'Daily Profit (₹)',
+                    data: lastDays.map(d => d.net_profit),
+                    borderColor: '#00c851',
+                    backgroundColor: 'rgba(0, 200, 81, 0.1)',
+                    tension: 0.3,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: true }
+                },
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+    }
+
+    // Monthly Profits
+    async function loadMonthlyProfits() {
+        try {
+            const response = await fetch(`${REPORTS_URL}/monthly-profits`);
+            const result = await response.json();
+
+            if (result.status === 'success') {
+                drawMonthlyChart(result.data);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+
+    function drawMonthlyChart(data) {
+        const ctx = document.getElementById('monthlyChart').getContext('2d');
+        
+        monthlyChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: data.map(d => d.month),
+                datasets: [{
+                    label: 'Monthly Sales (₹)',
+                    data: data.map(d => d.sales),
+                    backgroundColor: '#667eea'
+                }, {
+                    label: 'Monthly Profit (₹)',
+                    data: data.map(d => d.net_profit),
+                    backgroundColor: '#00c851'
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+    }
+
+    // Inventory Health
+    async function loadInventoryHealth() {
+        try {
+            const response = await fetch(`${REPORTS_URL}/inventory-health`);
+            const result = await response.json();
+
+            if (result.status === 'success') {
+                const data = result.data;
+                document.getElementById('totalProducts').textContent = data.total_products;
+                document.getElementById('healthyStock').textContent = data.healthy_stock;
+                document.getElementById('lowStock').textContent = data.low_stock_items;
+                document.getElementById('outOfStock').textContent = data.out_of_stock_items;
+                document.getElementById('inventoryValue').textContent = `₹${data.total_inventory_value.toFixed(2)}`;
+
+                drawInventoryChart(data);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+
+    function drawInventoryChart(data) {
+        const ctx = document.getElementById('inventoryChart').getContext('2d');
+        
+        inventoryChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Healthy', 'Low Stock', 'Out of Stock'],
+                datasets: [{
+                    data: [data.healthy_stock, data.low_stock_items, data.out_of_stock_items],
+                    backgroundColor: ['#00c851', '#ff9800', '#ff6b6b']
+                }]
+            },
+            options: {
+                responsive: true
+            }
+        });
+    }
+
+    // Customer Metrics
+    async function loadCustomerMetrics() {
+        try {
+            const response = await fetch(`${REPORTS_URL}/customer-metrics`);
+            const result = await response.json();
+
+            if (result.status === 'success') {
+                const data = result.data;
+                document.getElementById('custTotal').textContent = data.total_customers;
+                document.getElementById('custTransactions').textContent = data.total_transactions;
+                document.getElementById('custAvg').textContent = `₹${data.average_spending.toFixed(2)}`;
+                document.getElementById('custTop').textContent = `₹${data.top_customer_value.toFixed(2)}`;
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+</script>
+{% endblock %}

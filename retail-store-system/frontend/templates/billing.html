@@ -1,0 +1,275 @@
+{% extends 'base.html' %}
+
+{% block title %}Billing - RetailHub{% endblock %}
+
+{% block content %}
+<div class="mb-5">
+    <div class="row align-items-center mb-4">
+        <div class="col">
+            <h1 class="text-gradient fw-bold mb-1">
+                <i class="bi bi-receipt"></i> Billing
+            </h1>
+            <p class="text-muted">Create invoices and manage sales</p>
+        </div>
+        <div class="col-auto">
+            <button class="btn btn-success btn-lg rounded-3 shadow-sm" data-bs-toggle="modal" data-bs-target="#createBillModal">
+                <i class="bi bi-plus-circle me-2"></i> New Bill
+            </button>
+        </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="row mb-4 g-3">
+        <div class="col-md-3">
+            <div class="card stat-card border-0 shadow-sm rounded-4 bg-gradient-primary">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="icon-box me-3">
+                            <i class="bi bi-receipt" style="font-size: 2rem; color: #0072ff;"></i>
+                        </div>
+                        <div>
+                            <p class="text-muted mb-0 small">Total Bills</p>
+                            <h3 class="fw-bold mb-0" id="totalBills">0</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card border-0 shadow-sm rounded-4 bg-gradient-success">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="icon-box me-3">
+                            <i class="bi bi-currency-rupee" style="font-size: 2rem; color: #00c851;"></i>
+                        </div>
+                        <div>
+                            <p class="text-muted mb-0 small">Total Sales</p>
+                            <h3 class="fw-bold mb-0" id="totalSales">₹0</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card border-0 shadow-sm rounded-4 bg-gradient-warning">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="icon-box me-3">
+                            <i class="bi bi-percent" style="font-size: 2rem; color: #ff9800;"></i>
+                        </div>
+                        <div>
+                            <p class="text-muted mb-0 small">Total GST</p>
+                            <h3 class="fw-bold mb-0" id="totalGst">₹0</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card border-0 shadow-sm rounded-4 bg-gradient-info">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="icon-box me-3">
+                            <i class="bi bi-graph-up" style="font-size: 2rem; color: #00c6ff;"></i>
+                        </div>
+                        <div>
+                            <p class="text-muted mb-0 small">Avg Bill</p>
+                            <h3 class="fw-bold mb-0" id="avgBill">₹0</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bills Table -->
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+        <div class="card-header bg-light border-0 py-4 px-4">
+            <h5 class="mb-0 fw-bold"><i class="bi bi-list-ul"></i> Bills History</h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0 align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-4"><strong>#</strong></th>
+                            <th><strong>Customer</strong></th>
+                            <th><strong>Amount</strong></th>
+                            <th><strong>GST</strong></th>
+                            <th><strong>Final Amount</strong></th>
+                            <th><strong>Date</strong></th>
+                            <th class="text-center pe-4"><strong>Actions</strong></th>
+                        </tr>
+                    </thead>
+                    <tbody id="billsBody">
+                    </tbody>
+                </table>
+            </div>
+            <div id="emptyState" class="text-center py-5">
+                <i class="bi bi-inbox" style="font-size: 3rem; color: #ddd;"></i>
+                <p class="text-muted mt-3">No bills yet.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CREATE BILL MODAL - FIXED SCROLLING -->
+<div class="modal fade" id="createBillModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content border-0 rounded-4 shadow-lg">
+            <div class="modal-header border-0 bg-gradient-success rounded-top-4 p-4 sticky-top">
+                <h5 class="modal-title fw-bold text-white">
+                    <i class="bi bi-plus-circle me-2"></i> Create New Bill
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="createBillForm">
+                <div class="modal-body p-4">
+                    <!-- Customer Selection -->
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">
+                            <i class="bi bi-person-fill"></i> Select Customer *
+                        </label>
+                        <select required id="billCustomerId" class="form-control form-control-lg rounded-3">
+                            <option value="">-- Select Customer --</option>
+                        </select>
+                        <small class="text-muted">Choose customer from the list</small>
+                    </div>
+
+                    <hr>
+
+                    <!-- Bill Items -->
+                    <label class="form-label fw-semibold mb-3">
+                        <i class="bi bi-box-seam"></i> Bill Items *
+                    </label>
+                    <div id="billItemsContainer">
+                        <div class="bill-item mb-3 p-3 border rounded-3" style="background: #f9f9f9;">
+                            <div class="row g-2">
+                                <div class="col-md-4">
+                                    <label class="form-label small fw-semibold">Product</label>
+                                    <select required class="form-control rounded-3 product-select" onchange="updatePrice(this)">
+                                        <option value="">-- Select Product --</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label small fw-semibold">Qty</label>
+                                    <input required type="number" class="form-control rounded-3 item-quantity" min="1" value="1" onchange="calculateBillTotal()">
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label small fw-semibold">Price (₹)</label>
+                                    <input required type="number" step="0.01" class="form-control rounded-3 item-price" readonly>
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label small fw-semibold">Total</label>
+                                    <input type="number" class="form-control rounded-3 item-total" readonly>
+                                </div>
+                                <div class="col-md-1">
+                                    <label class="form-label small fw-semibold">&nbsp;</label>
+                                    <button type="button" class="btn btn-danger rounded-3 btn-sm w-100" onclick="removeBillItem(this)">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-outline-primary rounded-3 mb-4" onclick="addBillItem()">
+                        <i class="bi bi-plus me-2"></i> Add Item
+                    </button>
+
+                    <hr>
+
+                    <!-- Email Selection -->
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Send Invoice To:</label>
+                        <select class="form-control form-control-lg rounded-3" id="emailOption">
+                            <option value="customer">Customer Email</option>
+                            <option value="custom">Custom Email</option>
+                        </select>
+                    </div>
+
+                    <div id="customEmailContainer" class="mb-3" style="display: none;">
+                        <input type="email" class="form-control form-control-lg rounded-3" id="customEmail" placeholder="Enter email address">
+                    </div>
+
+                    <div class="mb-3" id="customerEmailContainer">
+                        <select class="form-control form-control-lg rounded-3" id="customerEmailSelect">
+                            <option value="">-- Select Customer Email --</option>
+                        </select>
+                    </div>
+
+                    <!-- Payment Method -->
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Payment Method:</label>
+                        <div class="btn-group w-100" role="group">
+                            <input type="radio" class="btn-check" name="paymentMethod" id="methodCash" value="cash" checked>
+                            <label class="btn btn-outline-primary" for="methodCash">
+                                <i class="bi bi-cash-coin"></i> Cash
+                            </label>
+
+                            <input type="radio" class="btn-check" name="paymentMethod" id="methodOnline" value="online">
+                            <label class="btn btn-outline-primary" for="methodOnline">
+                                <i class="bi bi-credit-card"></i> Online (Razorpay)
+                            </label>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <!-- Bill Summary -->
+                    <div class="row text-end g-3">
+                        <div class="col-6">
+                            <p class="text-muted mb-1 small">Subtotal:</p>
+                            <h5 class="fw-bold">₹<span id="subtotal">0.00</span></h5>
+                        </div>
+                        <div class="col-6">
+                            <p class="text-muted mb-1 small">GST (18%):</p>
+                            <h5 class="fw-bold">₹<span id="gstAmount">0.00</span></h5>
+                        </div>
+                        <div class="col-12 bg-light p-3 rounded-3">
+                            <p class="text-muted mb-1 small">Total Amount:</p>
+                            <h4 class="fw-bold text-success">₹<span id="finalAmount">0.00</span></h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 p-4 bg-light rounded-bottom-4 sticky-bottom">
+                    <button type="button" class="btn btn-secondary rounded-3" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success btn-lg rounded-3">
+                        <i class="bi bi-check-circle me-2"></i> Create Bill
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- VIEW BILL MODAL -->
+<div class="modal fade" id="viewBillModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content border-0 rounded-4 shadow-lg">
+            <div class="modal-header border-0 bg-gradient-info rounded-top-4 p-4">
+                <h5 class="modal-title fw-bold text-white">
+                    <i class="bi bi-receipt me-2"></i> Bill Details
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4" id="billDetailsContent">
+                <!-- Will be populated by JavaScript -->
+            </div>
+            <div class="modal-footer border-0 p-4 bg-light rounded-bottom-4">
+                <button type="button" class="btn btn-secondary rounded-3" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary rounded-3" onclick="printBill()">
+                    <i class="bi bi-printer me-2"></i> Print
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="toast-container position-fixed top-0 end-0 p-3" id="toastContainer"></div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script src="{{ url_for('static', filename='js/billing.js') }}"></script>
+
+{% endblock %}

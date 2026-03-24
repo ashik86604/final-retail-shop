@@ -1,0 +1,200 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - RetailHub{% endblock %}
+
+{% block content %}
+<div class="mb-5">
+    <h1 class="text-gradient fw-bold mb-1">
+        <i class="bi bi-graph-up"></i> Dashboard
+    </h1>
+    <p class="text-muted">Welcome back! Here's your business overview.</p>
+
+    <!-- Top Stats Row -->
+    <div class="row mb-4 g-3">
+        <div class="col-md-3">
+            <div class="card stat-card border-0 shadow-sm rounded-4 bg-light">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="text-muted mb-2 small">Total Products</p>
+                            <h3 class="fw-bold mb-0" id="totalProducts">0</h3>
+                        </div>
+                        <i class="bi bi-box-seam" style="font-size: 2rem; color: #667eea; opacity: 0.2;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card stat-card border-0 shadow-sm rounded-4 bg-light">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="text-muted mb-2 small">Total Customers</p>
+                            <h3 class="fw-bold mb-0" id="totalCustomers">0</h3>
+                        </div>
+                        <i class="bi bi-people" style="font-size: 2rem; color: #00c851; opacity: 0.2;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card stat-card border-0 shadow-sm rounded-4 bg-light">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="text-muted mb-2 small">Total Bills</p>
+                            <h3 class="fw-bold mb-0" id="totalBills">0</h3>
+                        </div>
+                        <i class="bi bi-receipt" style="font-size: 2rem; color: #ff9800; opacity: 0.2;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card stat-card border-0 shadow-sm rounded-4 bg-light">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="text-muted mb-2 small">Today's Sales</p>
+                            <h3 class="fw-bold mb-0" id="todaySales">₹0</h3>
+                        </div>
+                        <i class="bi bi-graph-up" style="font-size: 2rem; color: #ff5252; opacity: 0.2;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Second Row -->
+    <div class="row mb-4 g-3">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-body">
+                    <p class="text-muted mb-3 small">Total Sales</p>
+                    <h2 class="fw-bold text-success mb-0" id="totalSales">₹0</h2>
+                    <small class="text-muted">All time revenue</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-body">
+                    <p class="text-muted mb-3 small">Total GST</p>
+                    <h2 class="fw-bold text-warning mb-0" id="totalGst">₹0</h2>
+                    <small class="text-muted">18% GST collected</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-body">
+                    <p class="text-muted mb-3 small">Avg. Bill Value</p>
+                    <h2 class="fw-bold text-info mb-0" id="avgBill">₹0</h2>
+                    <small class="text-muted">Per transaction</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Third Row -->
+    <div class="row mb-4 g-3">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="fw-bold">📦 Inventory Value</h5>
+                        <i class="bi bi-box2-heart" style="color: #667eea;"></i>
+                    </div>
+                    <h3 class="fw-bold mb-1" id="inventoryValue">₹0</h3>
+                    <small class="text-muted">Total stock worth</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="fw-bold">⚠️ Low Stock Alert</h5>
+                        <i class="bi bi-exclamation-circle" style="color: #ff9800;"></i>
+                    </div>
+                    <h3 class="fw-bold mb-1" id="lowStockCount">0</h3>
+                    <small class="text-muted">Products need restocking</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tables Section -->
+    <div class="row g-3">
+        <!-- Recent Bills Table -->
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                <div class="card-header bg-light border-0 py-3 px-4">
+                    <h5 class="mb-0 fw-bold">
+                        <i class="bi bi-receipt me-2"></i> Recent Bills
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0 align-middle small">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="ps-4"><strong>Bill ID</strong></th>
+                                    <th><strong>Customer</strong></th>
+                                    <th><strong>Amount</strong></th>
+                                    <th class="pe-4"><strong>Date</strong></th>
+                                </tr>
+                            </thead>
+                            <tbody id="recentBillsBody">
+                                <tr>
+                                    <td colspan="4" class="text-center py-3 text-muted">Loading...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Products Table -->
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                <div class="card-header bg-light border-0 py-3 px-4">
+                    <h5 class="mb-0 fw-bold">
+                        <i class="bi bi-star me-2"></i> Top Products
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0 align-middle small">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="ps-4"><strong>Product</strong></th>
+                                    <th><strong>Price</strong></th>
+                                    <th><strong>Stock</strong></th>
+                                    <th class="pe-4"><strong>Value</strong></th>
+                                </tr>
+                            </thead>
+                            <tbody id="topProductsBody">
+                                <tr>
+                                    <td colspan="4" class="text-center py-3 text-muted">Loading...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}
